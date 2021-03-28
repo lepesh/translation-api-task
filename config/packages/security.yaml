@@ -7,4 +7,4 @@ security:
                 - App\Security\ApiTokenAuthenticator
 
     access_control:
-        # - { path: ^/test, roles: ROLE_READ }
+        - { path: ^/languages, roles: ROLE_READ }
