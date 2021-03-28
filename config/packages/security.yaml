@@ -1,0 +1,10 @@
+security:
+    enable_authenticator_manager: true
+
+    firewalls:
+        main:
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
+
+    access_control:
+        # - { path: ^/test, roles: ROLE_READ }
