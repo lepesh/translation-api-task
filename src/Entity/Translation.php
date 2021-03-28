@@ -6,9 +6,13 @@ use App\Repository\TranslationRepository;
 use App\Traits\IdentityTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity(repositoryClass=TranslationRepository::class)
+ * @ORM\Table(uniqueConstraints={
+ *     @UniqueConstraint(name="translation_uniq", columns={"translation_key_id", "language_id"})
+ * })
  */
 class Translation
 {
