@@ -18,4 +18,20 @@ class TranslationKeyRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, TranslationKey::class);
     }
+
+    public function save(TranslationKey $translationKey): TranslationKey
+    {
+        $this->_em->persist($translationKey);
+        $this->_em->flush();
+
+        return $translationKey;
+    }
+
+    public function delete(TranslationKey $translationKey): TranslationKey
+    {
+        $this->_em->remove($translationKey);
+        $this->_em->flush();
+
+        return $translationKey;
+    }
 }

@@ -7,4 +7,6 @@ security:
                 - App\Security\ApiTokenAuthenticator
 
     access_control:
-        - { path: ^/languages, roles: ROLE_READ }
+        - { path: ^/languages, roles: ROLE_READ, methods: [GET] }
+        - { path: ^/translation-keys, roles: ROLE_READ, methods: [GET] }
+        - { path: ^/translation-keys, roles: ROLE_WRITE, methods: [POST, PUT, DELETE] }
