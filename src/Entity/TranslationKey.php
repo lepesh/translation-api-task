@@ -19,17 +19,18 @@ class TranslationKey
     use IdentityTrait, TimestampableTrait;
 
     /**
+     * @Assert\NotNull()
      * @Assert\NotBlank()
      * @ORM\Column(type="string", length=255, unique=true)
      */
-    private $name;
+    private ?string $name;
 
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 

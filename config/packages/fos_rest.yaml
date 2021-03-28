@@ -15,3 +15,5 @@ fos_rest:
     format_listener:
         rules:
             - { path: ^/, prefer_extension: true, fallback_format: json, priorities: [ json ] }
+    view:
+        failed_validation: 422

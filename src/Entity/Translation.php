@@ -7,30 +7,42 @@ use App\Traits\IdentityTrait;
 use App\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TranslationRepository::class)
+ * @ORM\HasLifecycleCallbacks
  * @ORM\Table(uniqueConstraints={
  *     @UniqueConstraint(name="translation_uniq", columns={"translation_key_id", "language_id"})
  * })
+ * @UniqueEntity(
+ *     fields={"translationKey", "language"},
+ *     errorPath="translationKey",
+ *     message="Key is already have value for this language"
+ * )
  */
 class Translation
 {
     use IdentityTrait, TimestampableTrait;
 
     /**
+     * @Assert\NotNull()
      * @ORM\ManyToOne(targetEntity=TranslationKey::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $translationKey;
+    private ?TranslationKey $translationKey;
 
     /**
+     * @Assert\NotNull()
      * @ORM\ManyToOne(targetEntity=Language::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $language;
+    private ?Language $language;
 
     /**
+     * @Assert\NotNull()
+     * @Assert\NotBlank()
      * @ORM\Column(type="text")
      */
     private $value;

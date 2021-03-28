@@ -10,3 +10,5 @@ security:
         - { path: ^/languages, roles: ROLE_READ, methods: [GET] }
         - { path: ^/translation-keys, roles: ROLE_READ, methods: [GET] }
         - { path: ^/translation-keys, roles: ROLE_WRITE, methods: [POST, PUT, DELETE] }
+        - { path: ^/translations, roles: ROLE_READ, methods: [GET] }
+        - { path: ^/translations, roles: ROLE_WRITE, methods: [POST, PUT, DELETE] }

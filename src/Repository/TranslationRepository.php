@@ -18,4 +18,20 @@ class TranslationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Translation::class);
     }
+
+    public function save(Translation $translation): Translation
+    {
+        $this->_em->persist($translation);
+        $this->_em->flush();
+
+        return $translation;
+    }
+
+    public function delete(Translation $translation): Translation
+    {
+        $this->_em->remove($translation);
+        $this->_em->flush();
+
+        return $translation;
+    }
 }

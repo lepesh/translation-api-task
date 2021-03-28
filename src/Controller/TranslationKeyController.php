@@ -27,8 +27,8 @@ class TranslationKeyController extends AbstractFOSRestController
      */
     public function listAction(): Response
     {
-        $languages = $this->repository->findAll();
-        $view = $this->view($languages);
+        $keys = $this->repository->findAll();
+        $view = $this->view($keys);
 
         return $this->handleView($view);
     }
@@ -42,7 +42,7 @@ class TranslationKeyController extends AbstractFOSRestController
         $form = $this->createForm(TranslationKeyType::class, $key);
         $form->submit($request->toArray());
         if (!$form->isValid()) {
-            $view = $this->view($form, Response::HTTP_UNPROCESSABLE_ENTITY);
+            $view = $this->view($form);
             return $this->handleView($view);
         }
         $this->repository->save($key);
@@ -69,7 +69,7 @@ class TranslationKeyController extends AbstractFOSRestController
         $form = $this->createForm(TranslationKeyType::class, $key);
         $form->submit($request->toArray());
         if (!$form->isValid()) {
-            $view = $this->view($form, Response::HTTP_UNPROCESSABLE_ENTITY);
+            $view = $this->view($form);
             return $this->handleView($view);
         }
         $this->repository->save($key);
