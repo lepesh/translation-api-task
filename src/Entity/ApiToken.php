@@ -70,4 +70,14 @@ class ApiToken
         $this->roles = $roles;
         return $this;
     }
+
+    /**
+     * @param string $role
+     * @return ApiToken
+     */
+    public function addRole(string $role): ApiToken
+    {
+        $this->roles[] = $role;
+        return $this;
+    }
 }
