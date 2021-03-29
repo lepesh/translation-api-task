@@ -47,6 +47,12 @@ class Translation
      */
     private $value;
 
+    public function __construct(TranslationKey $translationKey = null, Language $language = null)
+    {
+        $this->translationKey = $translationKey;
+        $this->language = $language;
+    }
+
     public function getTranslationKey(): ?TranslationKey
     {
         return $this->translationKey;

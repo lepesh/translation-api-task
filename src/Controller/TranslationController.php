@@ -2,13 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Language;
 use App\Entity\Translation;
+use App\Form\Type\MachineTranslateType;
 use App\Form\Type\TranslationType;
 use App\Repository\TranslationRepository;
+use App\Service\Translation\MachineTranslator;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/translations")
@@ -16,12 +20,12 @@ use Symfony\Component\HttpFoundation\Response;
 class TranslationController extends AbstractFOSRestController
 {
     private TranslationRepository $repository;
-    
+
     public function __construct(TranslationRepository $repository)
     {
         $this->repository = $repository;
     }
-    
+
     /**
      * @Route("", methods={"GET"})
      */
@@ -82,5 +86,35 @@ class TranslationController extends AbstractFOSRestController
         $this->repository->delete($translation);
 
         return new Response();
+    }
+
+    /**
+     * @Route("/{id}/machine-translate", methods={"POST"})
+     */
+    public function machineTranslateAction(
+        Request $request,
+        Translation $translation,
+        MachineTranslator $machineTranslator,
+        ValidatorInterface $validator
+    ): Response
+    {
+        $form = $this->createForm(MachineTranslateType::class);
+        $form->submit($request->toArray());
+        if (!$form->isValid()) {
+            return $this->handleView($this->view($form));
+        }
+        /** @var Language $language */
+        $language = $form->getData()['language'];
+        $translatedText = $machineTranslator->translate($translation->getValue(), $language->getIsoCode());
+        $newTranslation = new Translation($translation->getTranslationKey(), $language);
+        $newTranslation->setValue($translatedText);
+        // validate if key-language pair is unique
+        $violations = $validator->validate($newTranslation);
+        if ($violations->count() > 0) {
+            return $this->handleView($this->view($violations, Response::HTTP_UNPROCESSABLE_ENTITY));
+        }
+        $this->repository->save($newTranslation);
+
+        return $this->handleView($this->view($newTranslation));
     }
 }
