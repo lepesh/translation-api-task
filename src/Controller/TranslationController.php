@@ -8,10 +8,13 @@ use App\Form\Type\MachineTranslateType;
 use App\Form\Type\TranslationType;
 use App\Repository\TranslationRepository;
 use App\Service\Translation\MachineTranslator;
+use App\Helper\Zipper\TranslationJsonZipper;
+use App\Helper\Zipper\TranslationYamlZipper;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -24,6 +27,29 @@ class TranslationController extends AbstractFOSRestController
     public function __construct(TranslationRepository $repository)
     {
         $this->repository = $repository;
+    }
+
+    /**
+     * @Route("/export", methods={"GET"})
+     */
+    public function exportAction(Request $request): Response
+    {
+        $format = $request->get('format', TranslationJsonZipper::JSON_EXTENSION);
+        $translationZipper = match ($format) {
+            TranslationJsonZipper::JSON_EXTENSION => new TranslationJsonZipper($this->repository),
+            TranslationYamlZipper::YAML_EXTENSION => new TranslationYamlZipper($this->repository),
+            default => throw new BadRequestHttpException('Unsupported format'),
+        };
+        $zipped = $translationZipper->zip();
+
+        $filename = sprintf('translations-%s-%s.zip', $format, date('YmdHis'));
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'private');
+        $response->headers->set('Content-type', 'application/zip');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '";');
+        $response->setContent($zipped);
+
+        return $response;
     }
 
     /**
