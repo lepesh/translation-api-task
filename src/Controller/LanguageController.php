@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -15,10 +16,10 @@ class LanguageController extends AbstractFOSRestController
     /**
      * @Route("/", methods={"GET"})
      */
-    public function listAction(LanguageRepository $languageRepository): Response
+    public function list(LanguageRepository $languageRepository): Response
     {
         $languages = $languageRepository->findAll();
-        $view = $this->view($languages, 200);
+        $view = $this->view($languages);
 
         return $this->handleView($view);
     }

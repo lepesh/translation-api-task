@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -33,7 +34,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("/export", methods={"GET"})
      */
-    public function exportAction(Request $request): Response
+    public function export(Request $request): Response
     {
         $format = $request->get('format', TranslationJsonZipper::JSON_EXTENSION);
         $translationZipper = match ($format) {
@@ -50,7 +51,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("", methods={"GET"})
      */
-    public function listAction(): Response
+    public function list(): Response
     {
         $translations = $this->repository->findAll();
         $view = $this->view($translations);
@@ -61,7 +62,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("", methods={"POST"})
      */
-    public function createAction(Request $request): Response
+    public function create(Request $request): Response
     {
         $translation = new Translation();
         $form = $this->createForm(TranslationType::class, $translation);
@@ -77,7 +78,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("/{id}", methods={"GET"})
      */
-    public function getAction(Translation $translation): Response
+    public function retrieve(Translation $translation): Response
     {
         $view = $this->view($translation);
 
@@ -87,7 +88,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("/{id}", methods={"PUT"})
      */
-    public function updateAction(Request $request, Translation $translation): Response
+    public function update(Request $request, Translation $translation): Response
     {
         $form = $this->createForm(TranslationType::class, $translation);
         $form->submit($request->toArray());
@@ -102,7 +103,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("/{id}", methods={"DELETE"})
      */
-    public function deleteAction(Translation $translation): Response
+    public function delete(Translation $translation): Response
     {
         $this->repository->delete($translation);
 
@@ -112,7 +113,7 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("/{id}/machine-translate", methods={"POST"})
      */
-    public function machineTranslateAction(
+    public function machineTranslate(
         Request $request,
         Translation $translation,
         MachineTranslator $machineTranslator,

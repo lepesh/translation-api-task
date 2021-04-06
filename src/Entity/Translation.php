@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -45,7 +46,7 @@ class Translation
      * @Assert\NotBlank()
      * @ORM\Column(type="text")
      */
-    private $value;
+    private string $value;
 
     public function __construct(TranslationKey $translationKey = null, Language $language = null)
     {

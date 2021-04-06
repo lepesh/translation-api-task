@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -25,7 +26,7 @@ class TranslationKeyController extends AbstractFOSRestController
     /**
      * @Route("", methods={"GET"})
      */
-    public function listAction(): Response
+    public function list(): Response
     {
         $keys = $this->repository->findAll();
         $view = $this->view($keys);
@@ -36,7 +37,7 @@ class TranslationKeyController extends AbstractFOSRestController
     /**
      * @Route("", methods={"POST"})
      */
-    public function createAction(Request $request): Response
+    public function create(Request $request): Response
     {
         $key = new TranslationKey();
         $form = $this->createForm(TranslationKeyType::class, $key);
@@ -54,7 +55,7 @@ class TranslationKeyController extends AbstractFOSRestController
     /**
      * @Route("/{id}", methods={"GET"})
      */
-    public function getAction(TranslationKey $key): Response
+    public function retrieve(TranslationKey $key): Response
     {
         $view = $this->view($key);
 
@@ -64,7 +65,7 @@ class TranslationKeyController extends AbstractFOSRestController
     /**
      * @Route("/{id}", methods={"PUT"})
      */
-    public function updateAction(Request $request, TranslationKey $key): Response
+    public function update(Request $request, TranslationKey $key): Response
     {
         $form = $this->createForm(TranslationKeyType::class, $key);
         $form->submit($request->toArray());
@@ -81,7 +82,7 @@ class TranslationKeyController extends AbstractFOSRestController
     /**
      * @Route("/{id}", methods={"DELETE"})
      */
-    public function deleteAction(TranslationKey $key): Response
+    public function delete(TranslationKey $key): Response
     {
         $this->repository->delete($key);
 

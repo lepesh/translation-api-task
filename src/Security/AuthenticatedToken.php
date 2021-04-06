@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Security;
 
@@ -49,7 +50,7 @@ class AuthenticatedToken extends AbstractToken
     public function __unserialize(array $data): void
     {
         [$this->apiToken, $parentData] = $data;
-        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
+        $parentData = is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Security;
 
 use App\Entity\ApiToken;
+use LogicException;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportTrait;
 
@@ -21,7 +23,7 @@ class ApiTokenPassport implements PassportInterface
     {
         if (null === $this->apiToken) {
             if (!$this->hasBadge(ApiTokenBadge::class)) {
-                throw new \LogicException('ApiTokenBadge is not configured for this passport.');
+                throw new LogicException('ApiTokenBadge is not configured for this passport.');
             }
             $this->apiToken = $this->getBadge(ApiTokenBadge::class)->getApiToken();
         }
