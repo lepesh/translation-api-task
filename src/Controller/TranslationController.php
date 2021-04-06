@@ -7,6 +7,7 @@ use App\Entity\Language;
 use App\Entity\Translation;
 use App\Form\Type\MachineTranslateType;
 use App\Form\Type\TranslationType;
+use App\Manager\TranslationManager;
 use App\Repository\TranslationRepository;
 use App\Response\ZipFileResponse;
 use App\Service\Translation\MachineTranslator;
@@ -24,22 +25,22 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class TranslationController extends AbstractFOSRestController
 {
-    private TranslationRepository $repository;
+    private TranslationManager $translationManager;
 
-    public function __construct(TranslationRepository $repository)
+    public function __construct(TranslationManager $repository)
     {
-        $this->repository = $repository;
+        $this->translationManager = $repository;
     }
 
     /**
      * @Route("/export", methods={"GET"})
      */
-    public function export(Request $request): Response
+    public function export(Request $request, TranslationRepository $repository): Response
     {
         $format = $request->get('format', TranslationJsonZipper::JSON_EXTENSION);
         $translationZipper = match ($format) {
-            TranslationJsonZipper::JSON_EXTENSION => new TranslationJsonZipper($this->repository),
-            TranslationYamlZipper::YAML_EXTENSION => new TranslationYamlZipper($this->repository),
+            TranslationJsonZipper::JSON_EXTENSION => new TranslationJsonZipper($repository),
+            TranslationYamlZipper::YAML_EXTENSION => new TranslationYamlZipper($repository),
             default => throw new BadRequestHttpException('Unsupported format'),
         };
         $content = $translationZipper->zip();
@@ -53,7 +54,7 @@ class TranslationController extends AbstractFOSRestController
      */
     public function list(): Response
     {
-        $translations = $this->repository->findAll();
+        $translations = $this->translationManager->getAll();
         $view = $this->view($translations);
 
         return $this->handleView($view);
@@ -70,7 +71,7 @@ class TranslationController extends AbstractFOSRestController
         if (!$form->isValid()) {
             return $this->handleView($this->view($form));
         }
-        $this->repository->save($translation);
+        $this->translationManager->save($translation);
 
         return $this->handleView($this->view($translation));
     }
@@ -95,7 +96,7 @@ class TranslationController extends AbstractFOSRestController
         if (!$form->isValid()) {
             return $this->handleView($this->view($form));
         }
-        $this->repository->save($translation);
+        $this->translationManager->save($translation);
 
         return $this->handleView($this->view($translation));
     }
@@ -105,7 +106,7 @@ class TranslationController extends AbstractFOSRestController
      */
     public function delete(Translation $translation): Response
     {
-        $this->repository->delete($translation);
+        $this->translationManager->delete($translation);
 
         return new Response();
     }
@@ -135,7 +136,7 @@ class TranslationController extends AbstractFOSRestController
         if ($violations->count() > 0) {
             return $this->handleView($this->view($violations, Response::HTTP_UNPROCESSABLE_ENTITY));
         }
-        $this->repository->save($newTranslation);
+        $this->translationManager->save($newTranslation);
 
         return $this->handleView($this->view($newTranslation));
     }

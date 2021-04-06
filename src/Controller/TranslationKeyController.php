@@ -5,7 +5,7 @@ namespace App\Controller;
 
 use App\Entity\TranslationKey;
 use App\Form\Type\TranslationKeyType;
-use App\Repository\TranslationKeyRepository;
+use App\Manager\TranslationKeyManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TranslationKeyController extends AbstractFOSRestController
 {
-    private TranslationKeyRepository $repository;
+    private TranslationKeyManager $translationKeyManager;
     
-    public function __construct(TranslationKeyRepository $repository)
+    public function __construct(TranslationKeyManager $translationKeyManager)
     {
-        $this->repository = $repository;
+        $this->translationKeyManager = $translationKeyManager;
     }
     
     /**
@@ -28,7 +28,7 @@ class TranslationKeyController extends AbstractFOSRestController
      */
     public function list(): Response
     {
-        $keys = $this->repository->findAll();
+        $keys = $this->translationKeyManager->getAll();
         $view = $this->view($keys);
 
         return $this->handleView($view);
@@ -43,13 +43,11 @@ class TranslationKeyController extends AbstractFOSRestController
         $form = $this->createForm(TranslationKeyType::class, $key);
         $form->submit($request->toArray());
         if (!$form->isValid()) {
-            $view = $this->view($form);
-            return $this->handleView($view);
+            return $this->handleView($this->view($form));
         }
-        $this->repository->save($key);
-        $view = $this->view($key);
+        $this->translationKeyManager->save($key);
 
-        return $this->handleView($view);
+        return $this->handleView($this->view($key));
     }
 
     /**
@@ -70,13 +68,11 @@ class TranslationKeyController extends AbstractFOSRestController
         $form = $this->createForm(TranslationKeyType::class, $key);
         $form->submit($request->toArray());
         if (!$form->isValid()) {
-            $view = $this->view($form);
-            return $this->handleView($view);
+            return $this->handleView($this->view($form));
         }
-        $this->repository->save($key);
-        $view = $this->view($key);
+        $this->translationKeyManager->save($key);
 
-        return $this->handleView($view);
+        return $this->handleView($this->view($key));
     }
 
     /**
@@ -84,7 +80,7 @@ class TranslationKeyController extends AbstractFOSRestController
      */
     public function delete(TranslationKey $key): Response
     {
-        $this->repository->delete($key);
+        $this->translationKeyManager->delete($key);
 
         return new Response();
     }
