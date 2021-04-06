@@ -7,6 +7,7 @@ use App\Entity\Translation;
 use App\Form\Type\MachineTranslateType;
 use App\Form\Type\TranslationType;
 use App\Repository\TranslationRepository;
+use App\Response\ZipFileResponse;
 use App\Service\Translation\MachineTranslator;
 use App\Helper\Zipper\TranslationJsonZipper;
 use App\Helper\Zipper\TranslationYamlZipper;
@@ -40,16 +41,10 @@ class TranslationController extends AbstractFOSRestController
             TranslationYamlZipper::YAML_EXTENSION => new TranslationYamlZipper($this->repository),
             default => throw new BadRequestHttpException('Unsupported format'),
         };
-        $zipped = $translationZipper->zip();
-
+        $content = $translationZipper->zip();
         $filename = sprintf('translations-%s-%s.zip', $format, date('YmdHis'));
-        $response = new Response();
-        $response->headers->set('Cache-Control', 'private');
-        $response->headers->set('Content-type', 'application/zip');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '";');
-        $response->setContent($zipped);
 
-        return $response;
+        return new ZipFileResponse($content, $filename);
     }
 
     /**
