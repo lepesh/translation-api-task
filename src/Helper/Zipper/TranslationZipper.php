@@ -3,19 +3,20 @@ declare(strict_types=1);
 
 namespace App\Helper\Zipper;
 
+use App\Entity\Translation;
 use App\Helper\TokenHelper;
-use App\Repository\TranslationRepository;
 use ZipArchive;
 
 abstract class TranslationZipper
 {
     private const TEMP_PATH = '/tmp';
 
-    private TranslationRepository $translationRepository;
+    /** @var array|Translation[] */
+    private array $translations;
 
-    public function __construct(TranslationRepository $translationRepository)
+    public function __construct(array $translations)
     {
-        $this->translationRepository = $translationRepository;
+        $this->translations = $translations;
     }
 
     /**
@@ -38,9 +39,8 @@ abstract class TranslationZipper
 
     protected function groupTranslations(): array
     {
-        $translations = $this->translationRepository->findAll();
         $groupedTranslations = [];
-        foreach ($translations as $translation) {
+        foreach ($this->translations as $translation) {
             $language = $translation->getLanguage()->getIsoCode();
             $key = $translation->getTranslationKey()->getName();
             $groupedTranslations[$language][$key] = $translation->getValue();

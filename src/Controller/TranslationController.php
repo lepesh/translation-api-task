@@ -8,16 +8,13 @@ use App\Entity\Translation;
 use App\Form\Type\MachineTranslateType;
 use App\Form\Type\TranslationType;
 use App\Manager\TranslationManager;
-use App\Repository\TranslationRepository;
 use App\Response\ZipFileResponse;
 use App\Service\Translation\MachineTranslator;
 use App\Helper\Zipper\TranslationJsonZipper;
-use App\Helper\Zipper\TranslationYamlZipper;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -35,16 +32,11 @@ class TranslationController extends AbstractFOSRestController
     /**
      * @Route("/export", methods={"GET"})
      */
-    public function export(Request $request, TranslationRepository $repository): Response
+    public function export(Request $request): Response
     {
         $format = $request->get('format', TranslationJsonZipper::JSON_EXTENSION);
-        $translationZipper = match ($format) {
-            TranslationJsonZipper::JSON_EXTENSION => new TranslationJsonZipper($repository),
-            TranslationYamlZipper::YAML_EXTENSION => new TranslationYamlZipper($repository),
-            default => throw new BadRequestHttpException('Unsupported format'),
-        };
-        $content = $translationZipper->zip();
-        $filename = sprintf('translations-%s-%s.zip', $format, date('YmdHis'));
+        $content = $this->translationManager->zip($format);
+        $filename = $this->translationManager->generateZipFilename();
 
         return new ZipFileResponse($content, $filename);
     }
