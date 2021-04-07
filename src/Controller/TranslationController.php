@@ -9,13 +9,12 @@ use App\Form\Type\MachineTranslateType;
 use App\Form\Type\TranslationType;
 use App\Manager\TranslationManager;
 use App\Response\ZipFileResponse;
-use App\Service\Translation\MachineTranslator;
+use App\Service\MachineTranslator;
 use App\Helper\Zipper\TranslationJsonZipper;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/translations")
@@ -109,8 +108,7 @@ class TranslationController extends AbstractFOSRestController
     public function machineTranslate(
         Request $request,
         Translation $translation,
-        MachineTranslator $machineTranslator,
-        ValidatorInterface $validator
+        MachineTranslator $machineTranslator
     ): Response
     {
         $form = $this->createForm(MachineTranslateType::class);
@@ -120,14 +118,7 @@ class TranslationController extends AbstractFOSRestController
         }
         /** @var Language $language */
         $language = $form->getData()['language'];
-        $translatedText = $machineTranslator->translate($translation->getValue(), $language->getIsoCode());
-        $newTranslation = new Translation($translation->getTranslationKey(), $language);
-        $newTranslation->setValue($translatedText);
-        // validate if key-language pair is unique
-        $violations = $validator->validate($newTranslation);
-        if ($violations->count() > 0) {
-            return $this->handleView($this->view($violations, Response::HTTP_UNPROCESSABLE_ENTITY));
-        }
+        $newTranslation = $machineTranslator->translate($translation, $language);
         $this->translationManager->save($newTranslation);
 
         return $this->handleView($this->view($newTranslation));
